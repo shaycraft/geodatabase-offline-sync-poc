@@ -13,7 +13,26 @@
 		C7747A1B29D49314000A97C6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7747A1929D49314000A97C6 /* Main.storyboard */; };
 		C7747A1D29D49315000A97C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7747A1C29D49315000A97C6 /* Assets.xcassets */; };
 		C7747A2029D49315000A97C6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7747A1E29D49315000A97C6 /* LaunchScreen.storyboard */; };
+		C7747A2A29D493C9000A97C6 /* ArcGIS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7747A2829D493C9000A97C6 /* ArcGIS.xcframework */; };
+		C7747A2B29D493C9000A97C6 /* ArcGIS.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7747A2829D493C9000A97C6 /* ArcGIS.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7747A2C29D493C9000A97C6 /* Runtimecore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7747A2929D493C9000A97C6 /* Runtimecore.xcframework */; };
+		C7747A2D29D493C9000A97C6 /* Runtimecore.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7747A2929D493C9000A97C6 /* Runtimecore.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C7747A2E29D493C9000A97C6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C7747A2B29D493C9000A97C6 /* ArcGIS.xcframework in Embed Frameworks */,
+				C7747A2D29D493C9000A97C6 /* Runtimecore.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C7747A1029D49314000A97C6 /* GeodatabaseOfflineSyncPOC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeodatabaseOfflineSyncPOC.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +43,8 @@
 		C7747A1C29D49315000A97C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C7747A1F29D49315000A97C6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C7747A2129D49315000A97C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C7747A2829D493C9000A97C6 /* ArcGIS.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ArcGIS.xcframework; path = ../../../Library/SDKs/ArcGIS/Frameworks/ArcGIS.xcframework; sourceTree = "<group>"; };
+		C7747A2929D493C9000A97C6 /* Runtimecore.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Runtimecore.xcframework; path = ../../../Library/SDKs/ArcGIS/Frameworks/Runtimecore.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +52,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7747A2A29D493C9000A97C6 /* ArcGIS.xcframework in Frameworks */,
+				C7747A2C29D493C9000A97C6 /* Runtimecore.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +65,7 @@
 			children = (
 				C7747A1229D49314000A97C6 /* GeodatabaseOfflineSyncPOC */,
 				C7747A1129D49314000A97C6 /* Products */,
+				C7747A2729D493C9000A97C6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -67,6 +91,15 @@
 			path = GeodatabaseOfflineSyncPOC;
 			sourceTree = "<group>";
 		};
+		C7747A2729D493C9000A97C6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C7747A2829D493C9000A97C6 /* ArcGIS.xcframework */,
+				C7747A2929D493C9000A97C6 /* Runtimecore.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -77,6 +110,7 @@
 				C7747A0C29D49314000A97C6 /* Sources */,
 				C7747A0D29D49314000A97C6 /* Frameworks */,
 				C7747A0E29D49314000A97C6 /* Resources */,
+				C7747A2E29D493C9000A97C6 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
