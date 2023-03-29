@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ArcGIS
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,6 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        AGSArcGISRuntimeEnvironment.apiKey = "AAPKd11368d6043b48449ba076433fe99388yh45QIVrF0fZtWddTOBleOGz6b1vf2bsBYy8YwqB4RHtXXHtPaXiZRe56RAyNeVe"
+        
         return true
     }
 
