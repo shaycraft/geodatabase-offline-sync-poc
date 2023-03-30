@@ -33,11 +33,20 @@ class ViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         // self._setupMapStatic()
+        do {
+            try self._downloadDirectory = self._createDownloadDirectory()
+        } catch {
+            self._printError(message: "Error creating download directory...")
+            print(error.localizedDescription)
+        }
+                
+        print(String(describing: self._downloadDirectory))
         self._setupMapGeodatabaseSync()
         
     }
     
     // private functions
+    
     private func _setupMapGeodatabaseSync() -> Void {
         let map = AGSMap(basemapStyle: .osmStreetsReliefBase)
         
@@ -79,12 +88,21 @@ class ViewController: UIViewController {
         
         self.mapView.map = map
         
-        
         self.mapView!.setViewpoint(self._getViewpoint(location: .CALIFORNIA))
     }
     
-    private func _createDownloadDirectory() -> Void {
+    private func _createDownloadDirectory() throws -> URL? {
+        let defaultManager = FileManager.default
+        let temporaryDownloadURL = defaultManager.temporaryDirectory.appendingPathComponent("TEMP_DOWNLOAD_GEODATABASE_SYNC")
         
+        if defaultManager.fileExists(atPath: temporaryDownloadURL.path) {
+            try defaultManager.removeItem(atPath: temporaryDownloadURL.path)
+        }
+        try  defaultManager.createDirectory(at: temporaryDownloadURL, withIntermediateDirectories: true, attributes: nil)
+        
+        // print( String(describing: defaultManager.subpaths(atPath: FileManager.default.temporaryDirectory.path)))
+        
+        return temporaryDownloadURL
     }
     
     private func _printError(message: String) -> Void {
