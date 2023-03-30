@@ -22,6 +22,7 @@ class ViewController: UIViewController {
     // private variables
     private var geodatabaseSyncTask: AGSGeodatabaseSyncTask = {
         let url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
+        // let url = "https://l9thfcs5hj.execute-api.us-west-2.amazonaws.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
         // let url = "https://fjk1l1iw9b.execute-api.us-east-2.amazonaws.com/arcgis/rest/services/GFEE/Gas_Distribution/FeatureServer"
         // let url = "https://lzhu34j6ie.execute-api.us-east-2.amazonaws.com/arcgis/rest/services/GFEE/Gas_Distribution/FeatureServer"
         let featureServiceURL = URL(string: url)!
