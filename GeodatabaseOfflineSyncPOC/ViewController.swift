@@ -22,6 +22,8 @@ class ViewController: UIViewController {
     // private variables
     private var geodatabaseSyncTask: AGSGeodatabaseSyncTask = {
         let url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
+        // let url = "https://fjk1l1iw9b.execute-api.us-east-2.amazonaws.com/arcgis/rest/services/GFEE/Gas_Distribution/FeatureServer"
+        // let url = "https://lzhu34j6ie.execute-api.us-east-2.amazonaws.com/arcgis/rest/services/GFEE/Gas_Distribution/FeatureServer"
         let featureServiceURL = URL(string: url)!
         return AGSGeodatabaseSyncTask(url: featureServiceURL)
     }()
@@ -50,6 +52,35 @@ class ViewController: UIViewController {
     
     // private functions
     
+    private func _displayLayersFromGeodatabase() -> Void {
+        guard let generatedGeoDatabase = self._generatedGeodatabase else { return }
+        
+        generatedGeoDatabase.load{ [weak self] (error: Error?) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                self._printError(message: "Error in loading downloading geodatabase...")
+                print(error.localizedDescription)
+            } else {
+                self.mapView.map?.operationalLayers.removeAllObjects()
+                
+                AGSLoadObjects(generatedGeoDatabase.geodatabaseFeatureTables) { (success: Bool) in
+                    if (success) {
+                        print("Offline tables loaded")
+                        
+                        for featureTable in generatedGeoDatabase.geodatabaseFeatureTables.reversed() {
+                            if featureTable.hasGeometry {
+                                let featureLayer = AGSFeatureLayer(featureTable: featureTable)
+                                self.mapView.map?.operationalLayers.add(featureLayer)
+                            }
+                        }
+                    }
+                    print("now showing from geodatabase")
+                }
+            }
+        }
+    }
+    
     private func _initiateSync() -> Void {
         guard let currentExtent = self._frameToExtent() else {
             self._printError(message: "Current extent null")
@@ -60,6 +91,8 @@ class ViewController: UIViewController {
         self.geodatabaseSyncTask.defaultGenerateGeodatabaseParameters(withExtent: currentExtent) { [weak self] (params: AGSGenerateGeodatabaseParameters?, error: Error?) in
             if let params = params,
                let self = self {
+                params.returnAttachments = false
+                
                 let dateFormatter = ISO8601DateFormatter()
                 
                 let downloadFileURL = self._downloadDirectory!.appendingPathComponent(dateFormatter.string(from: Date()))
@@ -72,17 +105,19 @@ class ViewController: UIViewController {
                 generateJob.start(
                     statusHandler: { (status: AGSJobStatus) in
                         print("Geo sync status is \(status.rawValue)")
-                        print(generateJob.progress.localizedDescription)
+                        print(generateJob.progress.localizedDescription!)
                     },
                     completion: { [weak self] (geodatabase: AGSGeodatabase?, error: Error?) in
                         
                         if let error = error {
                             self?._printError(message: "Error occurred in sync geodatabase operation...")
                             print(error.localizedDescription)
+                            print(error)
                         } else {
                             self?._generatedGeodatabase = geodatabase
                             print("Download complete!!!!!!!!!")
-                            // self?.displayLayersFromGeodatabase()
+                            
+                            self!._displayLayersFromGeodatabase()
                         }
                         
                         self?._activeJob = nil
@@ -104,43 +139,54 @@ class ViewController: UIViewController {
     }
     
     private func _frameToExtent() -> AGSGeometry? {
-        return self.mapView.currentViewpoint(with: .boundingGeometry)?.targetGeometry
+        return self.mapView.visibleArea
+        // return self.mapView.currentViewpoint(with: .boundingGeometry)?.targetGeometry
     }
     
     
     private func _setupMapGeodatabaseSync() -> Void {
-        let map = AGSMap(basemapStyle: .osmStreetsReliefBase)
+        let map = AGSMap(basemapStyle: .arcGISTopographic)
         
         self.mapView.map = map
         
-        self.geodatabaseSyncTask.load{[weak self] (error) in
-            print("Load completed...")
-            if let error = error {
-                self?._printError(message: "Error occurred during initial map load...")
-                print(error.localizedDescription)
+        self.mapView.map!.load{ (error) in
+            self.geodatabaseSyncTask.load{[weak self] (error) in
+                print("Load completed...")
+                if let error = error {
+                    self?._printError(message: "Error occurred during initial map load...")
+                    print(error.localizedDescription)
+                    
+                    return
+                }
                 
-                return
+                guard let self = self,
+                      let featureServiceInfo = self.geodatabaseSyncTask.featureServiceInfo else { return }
+                
+                self.mapView!.setViewpoint(self._getViewpoint(location: .SAN_FRANCISCO))
+                
+                let featureLayers = featureServiceInfo.layerInfos.enumerated().map{(offset, layerInfo) -> AGSFeatureLayer in
+                    print("DEBUG: adding layer \(layerInfo.name)")
+                    let layerURL = self.geodatabaseSyncTask.url!.appendingPathComponent(String(offset))
+                    let featureTable = AGSServiceFeatureTable(url: layerURL)
+                    let featureLayer = AGSFeatureLayer(featureTable: featureTable)
+                    featureLayer.name = layerInfo.name
+                    return featureLayer
+                }
+                
+                // Don't know why they call `reverse` here (I took this from the ESRI example, but assumign just `from: featureLayers` is okay?
+                self.mapView!.map?.operationalLayers.addObjects(from: featureLayers.reversed())
+                
+                print("About to initiate...")
+                print(self.mapView.map!.loadStatus.rawValue)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 12.0) {
+                    print("Queue fired")
+                    self._initiateSync()
+                }
             }
-            
-            guard let self = self,
-                  let featureServiceInfo = self.geodatabaseSyncTask.featureServiceInfo else { return }
-            
-            let featureLayers = featureServiceInfo.layerInfos.enumerated().map{(offset, layerInfo) -> AGSFeatureLayer in
-                print("DEBUG: adding layer \(layerInfo.name)")
-                let layerURL = self.geodatabaseSyncTask.url!.appendingPathComponent(String(offset))
-                let featureTable = AGSServiceFeatureTable(url: layerURL)
-                let featureLayer = AGSFeatureLayer(featureTable: featureTable)
-                featureLayer.name = layerInfo.name
-                return featureLayer
-            }
-            
-            // Don't know why they call `reverse` here (I took this from the ESRI example, but assumign just `from: featureLayers` is okay?
-            self.mapView!.map?.operationalLayers.addObjects(from: featureLayers.reversed())
-            
-            self.mapView!.setViewpoint(self._getViewpoint(location: .SAN_FRANCISCO))
-            
-            self._initiateSync()
         }
+        
+        
     }
     
     private func _setupMapStatic() -> Void {
@@ -184,7 +230,7 @@ class ViewController: UIViewController {
             return AGSViewpoint(
                 latitude: 39.731243,
                 longitude: -104.968526,
-                scale: 20_000
+                scale: 10_000
             )
         case ViewpointSelector.SAN_FRANCISCO:
             return AGSViewpoint(
