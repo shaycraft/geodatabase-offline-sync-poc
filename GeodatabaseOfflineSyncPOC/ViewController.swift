@@ -21,7 +21,10 @@ class ViewController: UIViewController {
     
     // private variables
     private var geodatabaseSyncTask: AGSGeodatabaseSyncTask = {
-        let url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
+        // let url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
+        // ec2 / nginx
+        let url = "https://ec2-54-149-175-248.us-west-2.compute.amazonaws.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
+        // let url = "https://services.arcgis.com/QdDMhZcUq2kGBzOx/arcgis/rest/services/tl_rd22_08049_roads/FeatureServer"
         // let url = "https://l9thfcs5hj.execute-api.us-west-2.amazonaws.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer"
         // let url = "https://fjk1l1iw9b.execute-api.us-east-2.amazonaws.com/arcgis/rest/services/GFEE/Gas_Distribution/FeatureServer"
         // let url = "https://lzhu34j6ie.execute-api.us-east-2.amazonaws.com/arcgis/rest/services/GFEE/Gas_Distribution/FeatureServer"
@@ -37,6 +40,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
+        AGSAuthenticationManager.shared().delegate = self
         // self._setupMapStatic()
         
         do {
@@ -197,7 +201,7 @@ class ViewController: UIViewController {
         
         self.mapView.map = map
         
-        self.mapView!.setViewpoint(self._getViewpoint(location: .CALIFORNIA))
+        self.mapView!.setViewpoint(self._getViewpoint(location: .SAN_FRANCISCO))
     }
     
     private func _createDownloadDirectory() throws -> URL? {
@@ -244,3 +248,14 @@ class ViewController: UIViewController {
     
 }
 
+// Set the credentials to allow access for the Naperville damage assessment feature service.
+extension ViewController: AGSAuthenticationManagerDelegate {
+    func authenticationManager(_ authenticationManager: AGSAuthenticationManager, didReceive challenge: AGSAuthenticationChallenge) {
+        print("DEBUG----->  Authentication challenge detected")
+        // NOTE: Never hardcode login information in a production application. This is done solely for the sake of the sample.
+        //        let credential = AGSCredential(user: "viewer01", password: "I68VGU^nMurF")
+        //        challenge.continue(with: credential)
+//                 challenge.continue(with: nil)
+        challenge.trustHostAndContinue()
+    }
+}
